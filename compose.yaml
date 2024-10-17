@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  db:
+    container_name: db-xuitter
+    image: postgres:12
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: xuitter
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - xuitter-network
+  api:
+    container_name: xuitter-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DB_URL: ${DB_URL}
+        PG_USER: ${PG_USER}
+        PG_PASSWORD: ${PG_PASSWORD}
+    ports:
+      - "8888:8080"
+    environment:
+      DB_URL: jdbc:postgresql://db-xuitter:5432/xuitter
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+    depends_on:
+      - db
+    networks:
+      - xuitter-network
+
+networks:
+  xuitter-network:
+    driver: bridge
+volumes:
+  pgdata: {}
