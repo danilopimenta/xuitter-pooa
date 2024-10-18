@@ -2,19 +2,20 @@ package com.xuitter.xuitter.service;
 
 import com.xuitter.xuitter.model.Tweet;
 import com.xuitter.xuitter.repository.TweetRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class XuitterService {
+
     private final TweetRepository tweetRepository;
 
     public XuitterService(TweetRepository tweetRepository) {
         this.tweetRepository = tweetRepository;
     }
-
-    public List<Tweet> list() {
-        return tweetRepository.findAllRecentTweets();
+    
+    public Page<Tweet> listRecentTweets(Pageable pageable) {
+        return tweetRepository.findAllRecentTweets(pageable);
     }
 }

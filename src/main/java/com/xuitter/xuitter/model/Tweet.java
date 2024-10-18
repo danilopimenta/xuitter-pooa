@@ -3,8 +3,11 @@ package com.xuitter.xuitter.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -15,12 +18,13 @@ public class Tweet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Content cannot be null")
+    @Size(max = 280, message = "Content must be 280 characters or less")
     @Column(unique = true, nullable = false, length = 280)
     private String content;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private java.util.Date createdAt = new java.util.Date(System.currentTimeMillis());
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JsonIgnoreProperties("tweets")
@@ -34,6 +38,14 @@ public class Tweet {
     )
     private Set<User> likes;
 
+    public Tweet() { this.createdAt = LocalDateTime.now(); }
+
+    public Tweet(String content, User user) {
+        this.content = content;
+        this.user = user;
+        this.createdAt = LocalDateTime.now();
+    }
+
     public Long getId() {
         return id;
     }
@@ -46,13 +58,9 @@ public class Tweet {
         this.content = content;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime();
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = java.util.Date.from(createdAt.atZone(java.time.ZoneId.systemDefault()).toInstant());
-    }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     public User getUser() {
         return user;
@@ -68,5 +76,30 @@ public class Tweet {
 
     public void setLikes(Set<User> likes) {
         this.likes = likes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tweet tweet = (Tweet) o;
+        return Objects.equals(id, tweet.id) &&
+                Objects.equals(content, tweet.content) &&
+                Objects.equals(user, tweet.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, content, user);
+    }
+
+    @Override
+    public String toString() {
+        return "Tweet{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", createdAt=" + createdAt +
+                ", user=" + user +
+                '}';
     }
 }
