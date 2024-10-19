@@ -1,6 +1,6 @@
 package com.xuitter.xuitter.controller;
 
-import com.xuitter.xuitter.dto.UserResponse;
+import com.xuitter.xuitter.dto.UserResponseDTO;
 import com.xuitter.xuitter.model.User;
 import com.xuitter.xuitter.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +15,11 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody User user) {
+    public ResponseEntity<UserResponseDTO> register(@RequestBody User user) {
         try {
             User newUser = userService.registerNewUser(user.getUsername(), user.getEmail(), user.getPassword());
             String token = userService.generateToken(newUser);
-            UserResponse userResponse = new UserResponse(newUser.getUsername(), newUser.getEmail(), token);
+            UserResponseDTO userResponse = new UserResponseDTO(newUser.getUsername(), newUser.getEmail(), token);
             return ResponseEntity.ok(userResponse);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(null);
@@ -27,13 +27,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<UserResponseDTO> login(@RequestParam String username, @RequestParam String password) {
         User user = userService.authenticate(username, password);
         if (user != null) {
             String token = userService.generateToken(user);
-            return ResponseEntity.ok(new UserResponse(user.getUsername(), user.getEmail(), token).toString());
+            UserResponseDTO userResponse = new UserResponseDTO(user.getUsername(), user.getEmail(), token);
+            return ResponseEntity.ok(userResponse);
         } else {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            return ResponseEntity.status(401).body(null);
         }
     }
 }

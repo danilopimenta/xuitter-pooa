@@ -42,10 +42,10 @@ public class User implements UserDetails {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false, length = 100)
     private String token;
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime tokenExpirationTime;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -53,7 +53,7 @@ public class User implements UserDetails {
 
     @ManyToMany
     @JoinTable(
-            name = "users_followers",
+            name = "followers",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
@@ -61,7 +61,7 @@ public class User implements UserDetails {
 
     @ManyToMany
     @JoinTable(
-            name = "users_followers",
+            name = "followers",
             joinColumns = @JoinColumn(name = "follower_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )

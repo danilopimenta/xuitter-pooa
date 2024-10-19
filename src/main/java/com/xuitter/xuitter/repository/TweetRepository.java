@@ -10,11 +10,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface TweetRepository extends JpaRepository<Tweet, Long> {
 
-    // Busca os tweets recentes de um usuário com paginação
-    @Query("SELECT t FROM Tweet t WHERE t.user = :user ORDER BY t.createdAt DESC")
-    Page<Tweet> findRecentTweetsByUser(@Param("user") User user, Pageable pageable);
+    @Query("SELECT t, COUNT(l) as tweet_likes FROM Tweet t LEFT JOIN t.likes l WHERE t.user = :user GROUP BY t ORDER BY t.createdAt DESC")
+    Page<Object[]> findRecentTweetsByUser(@Param("user") User user, Pageable pageable);
 
-    // Busca todos os tweets recentes com paginação
     @Query("SELECT t FROM Tweet t ORDER BY t.createdAt DESC")
     Page<Tweet> findAllRecentTweets(Pageable pageable);
+
+    boolean existsByIdAndUser(Long id, User user);
 }

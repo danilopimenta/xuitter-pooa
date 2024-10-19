@@ -1,11 +1,11 @@
 package com.xuitter.xuitter.dto;
 
-public class UserResponse {
+public class UserResponseDTO {
     private String username;
     private String email;
     private String token;
 
-    public UserResponse(String username, String email, String token) {
+    public UserResponseDTO(String username, String email, String token) {
         this.username = username;
         this.email = email;
         this.token = token;

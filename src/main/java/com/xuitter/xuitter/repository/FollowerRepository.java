@@ -5,19 +5,17 @@ import com.xuitter.xuitter.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface FollowerRepository extends JpaRepository<Follower, Long> {
 
-    Page<Follower> findByUser(User user, Pageable pageable);
+    Page<Follower> findByUserId(Long userId, Pageable pageable);
 
-    Page<Follower> findByFollower(User follower, Pageable pageable);
-
-    Optional<Follower> findByUserAndFollower(User user, User follower);
-
-    Long countByUser(User user);
-
-    Long countByFollower(User follower);
-
-    void deleteByUserAndFollower(User user, User follower);
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Follower f WHERE f.user = :user AND f.follower = :follower")
+    void deleteByUserAndUserFollowed(@Param("user") User user, @Param("follower") User userUnfollowed);
 }

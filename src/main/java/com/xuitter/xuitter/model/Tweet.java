@@ -20,7 +20,7 @@ public class Tweet {
 
     @NotNull(message = "Content cannot be null")
     @Size(max = 280, message = "Content must be 280 characters or less")
-    @Column(unique = true, nullable = false, length = 280)
+    @Column(length = 280, nullable = false)
     private String content;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -32,7 +32,7 @@ public class Tweet {
 
     @ManyToMany
     @JoinTable(
-            name = "tweets_likes",
+            name = "likes",
             joinColumns = @JoinColumn(name = "tweet_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
@@ -85,12 +85,13 @@ public class Tweet {
         Tweet tweet = (Tweet) o;
         return Objects.equals(id, tweet.id) &&
                 Objects.equals(content, tweet.content) &&
-                Objects.equals(user, tweet.user);
+                Objects.equals(user, tweet.user) &&
+                Objects.equals(createdAt, tweet.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, content, user);
+        return Objects.hash(id, content, user, createdAt);
     }
 
     @Override
