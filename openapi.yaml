@@ -1,0 +1,344 @@
+openapi: 3.0.0
+info:
+  title: Xuitter API
+  version: 1.0.0
+  description: API para a aplicação Xuitter, uma rede social similar ao Twitter.
+servers:
+  - url: http://localhost:8080
+paths:
+  /auth/register:
+    post:
+      summary: Registra um novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Usuário registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+        '400':
+          description: Erro na requisição
+  /auth/login:
+    post:
+      summary: Autentica um usuário
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Autenticação bem-sucedida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+        '401':
+          description: Credenciais inválidas
+  /users/{id}:
+    delete:
+      summary: Deleta um usuário
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário deletado com sucesso
+    put:
+      summary: Atualiza um usuário
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Usuário atualizado com sucesso
+  /tweets:
+    post:
+      summary: Cria um novo tweet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tweet'
+      responses:
+        '200':
+          description: Tweet criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TweetResponseDTO'
+        '400':
+          description: Erro na requisição
+  /tweets/{id}:
+    get:
+      summary: Retorna um tweet específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tweet retornado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TweetResponseDTO'
+        '404':
+          description: Tweet não encontrado
+    delete:
+      summary: Deleta um tweet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tweet deletado com sucesso
+    put:
+      summary: Atualiza um tweet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tweet'
+      responses:
+        '200':
+          description: Tweet atualizado com sucesso
+  /likes/tweet/{tweetId}:
+    post:
+      summary: Dá like em um tweet
+      parameters:
+        - name: tweetId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Like adicionado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeResponseDTO'
+    delete:
+      summary: Remove o like de um tweet
+      parameters:
+        - name: tweetId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Like removido com sucesso
+  /followers/user/{id}:
+    get:
+      summary: Lista os seguidores de um usuário
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de seguidores retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Follower'
+  /followers/follow/user/{userToFollow}:
+    post:
+      summary: Segue um usuário
+      parameters:
+        - name: userToFollow
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário seguido com sucesso
+  /followers/unfollow/user/{userToUnfollow}:
+    post:
+      summary: Deixa de seguir um usuário
+      parameters:
+        - name: userToUnfollow
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário deixado de seguir com sucesso
+  /:
+    get:
+      summary: Lista os tweets recentes
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Lista de tweets retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tweet'
+  /{username}:
+    get:
+      summary: Lista os tweets de um usuário específico
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Lista de tweets do usuário retornada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPageDTO'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        bio:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        token:
+          type: string
+        tokenExpirationTime:
+          type: string
+          format: date-time
+    UserResponseDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        token:
+          type: string
+    Tweet:
+      type: object
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/User'
+    TweetResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+        author:
+          type: string
+    LikeResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        tweetId:
+          type: integer
+        userId:
+          type: integer
+    Follower:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          $ref: '#/components/schemas/User'
+        follower:
+          $ref: '#/components/schemas/User'
+    UserPageDTO:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        followers:
+          type: integer
+        following:
+          type: integer
+        tweets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tweet'
